@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha384-pzjw8L4+6UqX5ZpR5eIMIhpK5LVJNcgSv1a9u4rG59gokxqj2Db/6EmfRD2f1x" crossorigin="anonymous">
+    <title>My Web App</title>
+</head>
+<body>
+    {% if user %}
+        <h1>Welcome, {{ user.username }}!</h1>
+
+        <form method="POST" action="{{ url_for('upload_post') }}" enctype="multipart/form-data">
+            <label for="post_type">Select post type:</label>
+            <select name="post_type" id="post_type">
+                <option value="photo">Photo</option>
+                <option value="video">Video</option>
+            </select>
+
+            <label for="content">Upload:</label>
+            <input type="file" name="content" accept="image/*, video/*" required>
+
+            <button type="submit">Upload</button>
+        </form>
+
+{% for post in posts %}
+    <div>
+        {% if post.type == 'photo' %}
+            <img src="{{ url_for('static', filename='photos/' + post.content) }}" alt="Photo">
+        {% elif post.type == 'video' %}
+            <video width="320" height="240" controls>
+                <source src="{{ url_for('static', filename='videos/' + post.content) }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        {% endif %}
+        <p>Likes: {{ post.likes }}</p>
+        <form method="POST" action="{{ url_for('like', post_id=post.id) }}" style="display: inline;">
+            <button type="submit">Like</button>
+        </form>
+        <form method="POST" action="{{ url_for('unlike', post_id=post.id) }}" style="display: inline;">
+            <button type="submit">Unlike</button>
+        </form>
+        <form method="POST" action="{{ url_for('share', post_id=post.id) }}" style="display: inline;">
+            <button type="submit">Share</button>
+        </form>
+    </div>
+{% endfor %}
+
+
+    {% else %}
+        <p>Please log in to view this page.</p>
+    {% endif %}
+</body>
+</html>
